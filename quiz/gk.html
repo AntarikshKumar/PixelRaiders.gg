@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌐 General Knowledge Quiz</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 3em;
+      color: #00ffd0;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px #000;
+    }
+    .question-box {
+      background-color: #1e1e1e;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 20px auto;
+      max-width: 700px;
+      box-shadow: 0 0 25px rgba(0, 255, 208, 0.4);
+      transition: all 0.3s ease-in-out;
+      transform: scale(1);
+    }
+    .question-box:hover {
+      transform: scale(1.02);
+    }
+    .question-box h2 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      color: #ff69b4;
+    }
+    .options button {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
+      padding: 14px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #222;
+      color: #00ffd0;
+      transition: all 0.3s;
+    }
+    .options button:hover {
+      background-color: #333;
+      border-color: #00ffd0;
+      box-shadow: 0 0 10px #00ffd0aa;
+    }
+    .timer {
+      font-size: 1.3em;
+      margin-top: 15px;
+      color: #ff69b4;
+      font-weight: bold;
+    }
+    .result {
+      font-size: 1.8em;
+      margin-top: 40px;
+      color: #00ffd0;
+      text-shadow: 1px 1px 5px #000;
+    }
+    #startBtn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: linear-gradient(to right, #00ffd0, #ff69b4);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 40px;
+      box-shadow: 0 0 15px #00ffd088;
+      transition: all 0.3s ease;
+    }
+    #startBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff69b4aa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌐 General Knowledge Quiz</h1>
+  <div id="quizContainer" class="question-box"></div>
+  <div class="timer" id="timer"></div>
+  <div class="result" id="result"></div>
+  <button id="startBtn" onclick="startQuiz()">Start Quiz</button>
+
+  <script>
+    const questions = [
+      { q: "What is the capital of France?", o: ["Berlin", "Madrid", "Paris", "Lisbon"], a: "Paris" },
+      { q: "Which planet is known as the Red Planet?", o: ["Earth", "Venus", "Mars", "Jupiter"], a: "Mars" },
+      { q: "How many continents are there?", o: ["5", "6", "7", "8"], a: "7" },
+      { q: "Who wrote 'Romeo and Juliet'?", o: ["William Shakespeare", "Mark Twain", "Charles Dickens", "Jane Austen"], a: "William Shakespeare" },
+      { q: "Which gas do plants absorb from the atmosphere?", o: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], a: "Carbon Dioxide" },
+      { q: "What is the largest mammal in the world?", o: ["Elephant", "Blue Whale", "Giraffe", "Hippopotamus"], a: "Blue Whale" },
+      { q: "What is the square root of 144?", o: ["11", "12", "13", "14"], a: "12" },
+      { q: "In which year did World War II end?", o: ["1945", "1939", "1941", "1946"], a: "1945" },
+      { q: "Which language has the most native speakers?", o: ["English", "Mandarin Chinese", "Hindi", "Spanish"], a: "Mandarin Chinese" },
+      { q: "Who painted the Mona Lisa?", o: ["Vincent van Gogh", "Leonardo da Vinci", "Pablo Picasso", "Claude Monet"], a: "Leonardo da Vinci" },
+
+      { q: "Which ocean is the largest?", o: ["Atlantic", "Indian", "Pacific", "Arctic"], a: "Pacific" },
+      { q: "What is H2O commonly known as?", o: ["Salt", "Water", "Oxygen", "Hydrogen"], a: "Water" },
+      { q: "Which metal is heavier: silver or gold?", o: ["Silver", "Gold", "Iron", "Copper"], a: "Gold" },
+      { q: "What is the fastest land animal?", o: ["Cheetah", "Tiger", "Leopard", "Lion"], a: "Cheetah" },
+      { q: "Which country invented pizza?", o: ["France", "Greece", "Italy", "USA"], a: "Italy" },
+      { q: "Which instrument has keys, pedals and strings?", o: ["Guitar", "Piano", "Harp", "Drums"], a: "Piano" },
+      { q: "Which planet has rings?", o: ["Earth", "Mars", "Saturn", "Venus"], a: "Saturn" },
+      { q: "How many teeth does an adult human have?", o: ["28", "30", "32", "36"], a: "32" },
+      { q: "What is the smallest prime number?", o: ["0", "1", "2", "3"], a: "2" },
+      { q: "What is the capital of Japan?", o: ["Kyoto", "Osaka", "Tokyo", "Hiroshima"], a: "Tokyo" },
+
+      { q: "What do bees make?", o: ["Milk", "Wax", "Honey", "Pollen"], a: "Honey" },
+      { q: "Which natural disaster is measured with a Richter scale?", o: ["Hurricane", "Flood", "Earthquake", "Tornado"], a: "Earthquake" },
+      { q: "What is the boiling point of water in Celsius?", o: ["90°C", "100°C", "110°C", "120°C"], a: "100°C" },
+      { q: "Which is the longest river in the world?", o: ["Amazon", "Nile", "Yangtze", "Mississippi"], a: "Nile" },
+      { q: "What color do you get when you mix red and white?", o: ["Pink", "Purple", "Brown", "Orange"], a: "Pink" },
+      { q: "Who discovered gravity?", o: ["Albert Einstein", "Isaac Newton", "Galileo Galilei", "Nikola Tesla"], a: "Isaac Newton" },
+      { q: "Which organ pumps blood?", o: ["Lungs", "Liver", "Heart", "Brain"], a: "Heart" },
+      { q: "Which sport uses a bat, ball, and stumps?", o: ["Baseball", "Tennis", "Cricket", "Football"], a: "Cricket" },
+      { q: "Which bird is known for mimicking sounds?", o: ["Parrot", "Eagle", "Sparrow", "Peacock"], a: "Parrot" },
+      { q: "How many sides does a hexagon have?", o: ["5", "6", "7", "8"], a: "6" },
+
+      { q: "What is the chemical symbol for gold?", o: ["G", "Go", "Au", "Ag"], a: "Au" },
+      { q: "Which is the hardest natural substance?", o: ["Gold", "Iron", "Diamond", "Quartz"], a: "Diamond" },
+      { q: "Which planet is closest to the sun?", o: ["Mercury", "Venus", "Earth", "Mars"], a: "Mercury" },
+      { q: "How many hours in two days?", o: ["24", "36", "48", "72"], a: "48" },
+      { q: "Which famous scientist had a theory of relativity?", o: ["Isaac Newton", "Albert Einstein", "Stephen Hawking", "Galileo Galilei"], a: "Albert Einstein" },
+      { q: "Which month has 28 days?", o: ["February", "April", "June", "All months"], a: "All months" },
+      { q: "What is the tallest mountain in the world?", o: ["K2", "Everest", "Kangchenjunga", "Makalu"], a: "Everest" },
+      { q: "Which is the only mammal that can fly?", o: ["Squirrel", "Bat", "Bird", "Monkey"], a: "Bat" },
+      { q: "Which blood group is a universal donor?", o: ["A", "B", "AB", "O negative"], a: "O negative" },
+      { q: "Which country is known as the Land of the Rising Sun?", o: ["China", "India", "Japan", "Thailand"], a: "Japan" }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let countdown;
+    let quizSet = [];
+
+    function startQuiz() {
+      quizSet = questions.sort(() => 0.5 - Math.random()).slice(0, 10);
+      current = 0;
+      score = 0;
+      document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('result').innerHTML = '';
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      clearInterval(countdown);
+      if (current >= quizSet.length) {
+        showResult();
+        return;
+      }
+      const q = quizSet[current];
+      document.getElementById('quizContainer').innerHTML = `
+        <h2>${q.q}</h2>
+        <div class="options">
+          ${q.o.map(opt => `<button onclick=\"checkAnswer('${opt}')\">${opt}</button>`).join('')}
+        </div>
+      `;
+      let time = 10;
+      document.getElementById('timer').innerText = `⏱️ Time Left: ${time}s`;
+      countdown = setInterval(() => {
+        time--;
+        document.getElementById('timer').innerText = `⏱️ Time Left: ${time}s`;
+        if (time === 0) {
+          clearInterval(countdown);
+          current++;
+          loadQuestion();
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(selected) {
+      clearInterval(countdown);
+      if (selected === quizSet[current].a) score++;
+      current++;
+      loadQuestion();
+    }
+
+    function showResult() {
+      document.getElementById('quizContainer').innerHTML = '';
+      document.getElementById('timer').innerHTML = '';
+      let message = score >= 8 ? '🎉 Excellent!' : score >= 5 ? '👍 Good Job!' : '😅 Try Again!';
+      document.getElementById('result').innerText = `Your Score: ${score}/10\n${message}`;
+      document.getElementById('startBtn').style.display = 'inline-block';
+    }
+  </script>
+</body>
+</html>

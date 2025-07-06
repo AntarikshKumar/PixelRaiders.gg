@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏀 Sports Trivia Quiz</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 3em;
+      color: #00ffd0;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px #000;
+    }
+    .question-box {
+      background-color: #1e1e1e;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 20px auto;
+      max-width: 700px;
+      box-shadow: 0 0 25px rgba(0, 255, 208, 0.4);
+      transition: all 0.3s ease-in-out;
+      transform: scale(1);
+    }
+    .question-box:hover {
+      transform: scale(1.02);
+    }
+    .question-box h2 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      color: #ff69b4;
+    }
+    .options button {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
+      padding: 14px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #222;
+      color: #00ffd0;
+      transition: all 0.3s;
+    }
+    .options button:hover {
+      background-color: #333;
+      border-color: #00ffd0;
+      box-shadow: 0 0 10px #00ffd0aa;
+    }
+    .timer {
+      font-size: 1.3em;
+      margin-top: 15px;
+      color: #ff69b4;
+      font-weight: bold;
+    }
+    .result {
+      font-size: 1.8em;
+      margin-top: 40px;
+      color: #00ffd0;
+      text-shadow: 1px 1px 5px #000;
+    }
+    #startBtn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: linear-gradient(to right, #00ffd0, #ff69b4);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 40px;
+      box-shadow: 0 0 15px #00ffd088;
+      transition: all 0.3s ease;
+    }
+    #startBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff69b4aa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏀 Sports Trivia Quiz</h1>
+  <div id="quizContainer" class="question-box"></div>
+  <div class="timer" id="timer"></div>
+  <div class="result" id="result"></div>
+  <button id="startBtn" onclick="startQuiz()">Start Quiz</button>
+
+  <script>
+    const questions = [
+      { q: "How many players are there in a soccer team on the field?", o: ["10", "11", "12", "13"], a: "11" },
+      { q: "Which sport uses a shuttlecock?", o: ["Tennis", "Badminton", "Squash", "Volleyball"], a: "Badminton" },
+      { q: "In which country were the first modern Olympics held?", o: ["France", "USA", "Greece", "UK"], a: "Greece" },
+      { q: "How many rings are there in the Olympic symbol?", o: ["4", "5", "6", "7"], a: "5" },
+      { q: "Who has won the most Grand Slam titles in men's tennis? (as of 2024)", o: ["Nadal", "Djokovic", "Federer", "Sampras"], a: "Djokovic" },
+      { q: "What sport does Cristiano Ronaldo play?", o: ["Basketball", "Tennis", "Soccer", "Cricket"], a: "Soccer" },
+      { q: "Which country won the 2018 FIFA World Cup?", o: ["Brazil", "France", "Germany", "Argentina"], a: "France" },
+      { q: "Which sport is known as the 'king of sports'?", o: ["Baseball", "Soccer", "Basketball", "Cricket"], a: "Soccer" },
+      { q: "Which cricket player is known as the 'Little Master'?", o: ["Virat Kohli", "MS Dhoni", "Sunil Gavaskar", "Kapil Dev"], a: "Sunil Gavaskar" },
+      { q: "Which sport uses the term 'alley-oop'?", o: ["Basketball", "Volleyball", "Football", "Hockey"], a: "Basketball" },
+      
+      { q: "How long is a marathon?", o: ["26.2 miles", "20 miles", "13.1 miles", "30 miles"], a: "26.2 miles" },
+      { q: "Which sport uses a puck?", o: ["Baseball", "Hockey", "Football", "Cricket"], a: "Hockey" },
+      { q: "Who won the NBA championship in 2023?", o: ["Heat", "Nuggets", "Lakers", "Warriors"], a: "Nuggets" },
+      { q: "Which country hosts the Wimbledon tennis tournament?", o: ["USA", "France", "Australia", "UK"], a: "UK" },
+      { q: "Which boxer was known as 'The Greatest'?", o: ["Tyson", "Ali", "Holyfield", "Mayweather"], a: "Ali" },
+      { q: "In which sport is the term 'birdie' used?", o: ["Golf", "Tennis", "Hockey", "Football"], a: "Golf" },
+      { q: "Which athlete has won the most Olympic medals?", o: ["Usain Bolt", "Carl Lewis", "Michael Phelps", "Mark Spitz"], a: "Michael Phelps" },
+      { q: "What is the national sport of Japan?", o: ["Judo", "Karate", "Sumo Wrestling", "Baseball"], a: "Sumo Wrestling" },
+      { q: "How many players are on a baseball team on the field?", o: ["7", "8", "9", "10"], a: "9" },
+      { q: "Which female tennis player has won the most Grand Slams?", o: ["Serena Williams", "Martina Navratilova", "Steffi Graf", "Margaret Court"], a: "Margaret Court" },
+
+      { q: "Which country has won the most Cricket World Cups?", o: ["India", "England", "Australia", "West Indies"], a: "Australia" },
+      { q: "Which football club has won the most UEFA Champions League titles?", o: ["Barcelona", "Liverpool", "AC Milan", "Real Madrid"], a: "Real Madrid" },
+      { q: "In which sport can you get a 'hole in one'?", o: ["Tennis", "Golf", "Baseball", "Bowling"], a: "Golf" },
+      { q: "How many holes are there in a standard round of golf?", o: ["9", "12", "18", "21"], a: "18" },
+      { q: "Which sport is associated with Wimbledon?", o: ["Football", "Tennis", "Golf", "Rugby"], a: "Tennis" },
+      { q: "Which Indian cricketer is known as the 'Hitman'?", o: ["Virat Kohli", "Rohit Sharma", "Shikhar Dhawan", "Rishabh Pant"], a: "Rohit Sharma" },
+      { q: "What color flag indicates the winner in Formula 1?", o: ["Red", "Green", "Black", "Checkered"], a: "Checkered" },
+      { q: "Which Olympic event includes running, swimming and cycling?", o: ["Triathlon", "Pentathlon", "Decathlon", "Heptathlon"], a: "Triathlon" },
+      { q: "Which player is known as the 'King of Clay'?", o: ["Federer", "Djokovic", "Nadal", "Thiem"], a: "Nadal" },
+      { q: "Which country hosted the 2022 FIFA World Cup?", o: ["Qatar", "Russia", "Brazil", "Germany"], a: "Qatar" }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let countdown;
+    let quizSet = [];
+
+    function startQuiz() {
+      quizSet = questions.sort(() => 0.5 - Math.random()).slice(0, 10);
+      current = 0;
+      score = 0;
+      document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('result').innerHTML = '';
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      clearInterval(countdown);
+      if (current >= quizSet.length) {
+        showResult();
+        return;
+      }
+      const q = quizSet[current];
+      document.getElementById('quizContainer').innerHTML = `
+        <h2>${q.q}</h2>
+        <div class="options">
+          ${q.o.map(opt => `<button onclick=\"checkAnswer('${opt}')\">${opt}</button>`).join('')}
+        </div>
+      `;
+      let time = 10;
+      document.getElementById('timer').innerText = `⏱️ Time Left: ${time}s`;
+      countdown = setInterval(() => {
+        time--;
+        document.getElementById('timer').innerText = `⏱️ Time Left: ${time}s`;
+        if (time === 0) {
+          clearInterval(countdown);
+          current++;
+          loadQuestion();
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(selected) {
+      clearInterval(countdown);
+      if (selected === quizSet[current].a) score++;
+      current++;
+      loadQuestion();
+    }
+
+    function showResult() {
+      document.getElementById('quizContainer').innerHTML = '';
+      document.getElementById('timer').innerHTML = '';
+      let message = score >= 8 ? '🎉 Excellent!' : score >= 5 ? '👍 Good Job!' : '😅 Try Again!';
+      document.getElementById('result').innerText = `Your Score: ${score}/10\n${message}`;
+      document.getElementById('startBtn').style.display = 'inline-block';
+    }
+  </script>
+</body>
+</html>

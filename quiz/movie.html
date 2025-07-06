@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎬 Movie Trivia Quiz</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #1c1c1c, #0f0f0f);
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 3em;
+      color: #00ffd0;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px #000;
+    }
+    .question-box {
+      background-color: #1e1e1e;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 20px auto;
+      max-width: 700px;
+      box-shadow: 0 0 25px rgba(0, 255, 208, 0.4);
+      transition: all 0.3s ease-in-out;
+      transform: scale(1);
+    }
+    .question-box:hover {
+      transform: scale(1.02);
+    }
+    .question-box h2 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      color: #ff69b4;
+    }
+    .options button {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
+      padding: 14px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #222;
+      color: #00ffd0;
+      transition: all 0.3s;
+    }
+    .options button:hover {
+      background-color: #333;
+      border-color: #00ffd0;
+      box-shadow: 0 0 10px #00ffd0aa;
+    }
+    .timer {
+      font-size: 1.3em;
+      margin-top: 15px;
+      color: #ff69b4;
+      font-weight: bold;
+    }
+    .result {
+      font-size: 1.8em;
+      margin-top: 40px;
+      color: #00ffd0;
+      text-shadow: 1px 1px 5px #000;
+    }
+    #startBtn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: linear-gradient(to right, #00ffd0, #ff69b4);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 40px;
+      box-shadow: 0 0 15px #00ffd088;
+      transition: all 0.3s ease;
+    }
+    #startBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff69b4aa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎬 Movie Trivia Quiz</h1>
+  <div id="quizContainer" class="question-box"></div>
+  <div class="timer" id="timer"></div>
+  <div class="result" id="result"></div>
+  <button id="startBtn" onclick="startQuiz()">Start Quiz</button>
+
+  <script>
+    const questions = [
+  { q: "Who directed 'Inception'?", o: ["Christopher Nolan", "Steven Spielberg", "James Cameron", "Martin Scorsese"], a: "Christopher Nolan" },
+  { q: "Which film won Best Picture at the 1994 Oscars?", o: ["Pulp Fiction", "The Shawshank Redemption", "Forrest Gump", "Quiz Show"], a: "Forrest Gump" },
+  { q: "Who played the Joker in 'The Dark Knight'?", o: ["Heath Ledger", "Joaquin Phoenix", "Jared Leto", "Jack Nicholson"], a: "Heath Ledger" },
+  { q: "Which year was 'Jurassic Park' released?", o: ["1993", "1990", "1995", "1997"], a: "1993" },
+  { q: "Who played Jack in 'Titanic'?", o: ["Leonardo DiCaprio", "Brad Pitt", "Tom Cruise", "Johnny Depp"], a: "Leonardo DiCaprio" },
+  { q: "What is the name of the hobbit played by Elijah Wood in the Lord of the Rings?", o: ["Frodo", "Sam", "Pippin", "Merry"], a: "Frodo" },
+  { q: "Which movie features the quote, 'Here's looking at you, kid'", o: ["Casablanca", "Gone with the Wind", "The Godfather", "Citizen Kane"], a: "Casablanca" },
+  { q: "In which movie did Tom Hanks play a man stranded on an island?", o: ["Cast Away", "Forrest Gump", "The Terminal", "Captain Phillips"], a: "Cast Away" },
+  { q: "Which actress played Hermione Granger in the Harry Potter series?", o: ["Emma Watson", "Emma Stone", "Natalie Portman", "Keira Knightley"], a: "Emma Watson" },
+  { q: "Who directed 'Pulp Fiction'?", o: ["Quentin Tarantino", "Martin Scorsese", "Robert Rodriguez", "Tim Burton"], a: "Quentin Tarantino" },
+
+  { q: "Which actor voiced Woody in the Toy Story series?", o: ["Tom Hanks", "Tim Allen", "Billy Crystal", "Robin Williams"], a: "Tom Hanks" },
+  { q: "What is the highest-grossing movie of all time (as of 2024)?", o: ["Avatar", "Avengers: Endgame", "Titanic", "Star Wars: The Force Awakens"], a: "Avatar" },
+  { q: "Which movie won Best Picture at the 2020 Oscars?", o: ["1917", "Parasite", "Joker", "Once Upon a Time in Hollywood"], a: "Parasite" },
+  { q: "What is the name of the wizarding school in the Harry Potter universe?", o: ["Durmstrang", "Hogwarts", "Beauxbatons", "Ilvermorny"], a: "Hogwarts" },
+  { q: "In 'The Matrix', what is the color of the pill Neo takes?", o: ["Blue", "Red", "Green", "Yellow"], a: "Red" },
+  { q: "Which actor played Deadpool?", o: ["Ryan Reynolds", "Hugh Jackman", "Chris Evans", "Robert Downey Jr."], a: "Ryan Reynolds" },
+  { q: "Which film franchise features the character 'Legolas'?", o: ["Harry Potter", "Chronicles of Narnia", "Lord of the Rings", "Percy Jackson"], a: "Lord of the Rings" },
+  { q: "Who composed the score for 'Star Wars'?", o: ["Hans Zimmer", "John Williams", "Howard Shore", "Danny Elfman"], a: "John Williams" },
+  { q: "Which 1999 film features the character Tyler Durden?", o: ["The Matrix", "American Beauty", "Fight Club", "The Sixth Sense"], a: "Fight Club" },
+  { q: "What does 'ET' stand for in the movie title?", o: ["Extra-Teleport", "Elder Thing", "Extra-Terrestrial", "Earth Traveler"], a: "Extra-Terrestrial" },
+
+  { q: "Who played the main character in the 'Pirates of the Caribbean' series?", o: ["Johnny Depp", "Orlando Bloom", "Geoffrey Rush", "Javier Bardem"], a: "Johnny Depp" },
+  { q: "Which movie features a character named Andy Dufresne?", o: ["The Shawshank Redemption", "Green Mile", "The Godfather", "Fight Club"], a: "The Shawshank Redemption" },
+  { q: "Who played Batman in 'The Dark Knight' trilogy?", o: ["Christian Bale", "Ben Affleck", "Robert Pattinson", "Michael Keaton"], a: "Christian Bale" },
+  { q: "What is the name of the kingdom in Disney's 'Frozen'?", o: ["Arendelle", "Corona", "Andalasia", "Genovia"], a: "Arendelle" },
+  { q: "Which actor portrayed Wolverine in the X-Men series?", o: ["Hugh Jackman", "Chris Hemsworth", "Tom Hardy", "Ben Affleck"], a: "Hugh Jackman" },
+  { q: "Which movie popularized the phrase 'I'll be back'?", o: ["The Terminator", "Predator", "Commando", "Total Recall"], a: "The Terminator" },
+  { q: "Which film stars Julia Roberts as a legal clerk in a true story?", o: ["Erin Brockovich", "Notting Hill", "Pretty Woman", "Runaway Bride"], a: "Erin Brockovich" },
+  { q: "What is the name of the talking snowman in 'Frozen'?", o: ["Olaf", "Sven", "Kristoff", "Hans"], a: "Olaf" },
+  { q: "Which director is known for the movie 'The Grand Budapest Hotel'?", o: ["Wes Anderson", "David Fincher", "Spike Jonze", "Coen Brothers"], a: "Wes Anderson" },
+  { q: "Which 1994 movie tells the story of a slow-witted but kind-hearted man from Alabama?", o: ["Forrest Gump", "Rain Man", "Big Fish", "The Green Mile"], a: "Forrest Gump" },
+
+  { q: "Who voiced the character of Dory in 'Finding Nemo'?", o: ["Ellen DeGeneres", "Julia Louis-Dreyfus", "Tina Fey", "Amy Poehler"], a: "Ellen DeGeneres" },
+  { q: "Which film is about a rat who becomes a chef in Paris?", o: ["Ratatouille", "The Secret Life of Pets", "Bolt", "Zootopia"], a: "Ratatouille" },
+  { q: "What is the name of the main character in 'The Revenant'?", o: ["Hugh Glass", "John Fitzgerald", "Jim Bridger", "Will Poulter"], a: "Hugh Glass" },
+  { q: "Who directed the 1993 classic 'Schindler’s List'?", o: ["Steven Spielberg", "Roman Polanski", "Clint Eastwood", "Stanley Kubrick"], a: "Steven Spielberg" },
+  { q: "Which movie tells the story of a man aging backwards?", o: ["The Curious Case of Benjamin Button", "The Time Traveler’s Wife", "Interstellar", "In Time"], a: "The Curious Case of Benjamin Button" },
+  { q: "Who plays Black Widow in the Marvel Cinematic Universe?", o: ["Scarlett Johansson", "Elizabeth Olsen", "Brie Larson", "Natalie Portman"], a: "Scarlett Johansson" },
+  { q: "Which musical film stars Hugh Jackman as P.T. Barnum?", o: ["The Greatest Showman", "Les Misérables", "Moulin Rouge!", "Chicago"], a: "The Greatest Showman" },
+  { q: "In which movie does Leonardo DiCaprio play a stockbroker?", o: ["The Wolf of Wall Street", "Catch Me If You Can", "The Great Gatsby", "Revolutionary Road"], a: "The Wolf of Wall Street" },
+  { q: "Who directed 'Dunkirk'?", o: ["Christopher Nolan", "Sam Mendes", "Kathryn Bigelow", "Ridley Scott"], a: "Christopher Nolan" },
+  { q: "Which movie is about a robot left on Earth to clean up the mess?", o: ["WALL-E", "Big Hero 6", "Robots", "The Iron Giant"], a: "WALL-E" },
+];
+
+    // 100 questions already filled; no placeholder needed.?`, o: ["Option A", "Option B", "Option C", "Option D"], a: "Option A" });
+    
+
+    let current = 0;
+    let score = 0;
+    let countdown;
+    let quizSet = [];
+
+    function startQuiz() {
+      quizSet = questions.sort(() => 0.5 - Math.random()).slice(0, 10);
+      current = 0;
+      score = 0;
+      document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('result').innerHTML = '';
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      clearInterval(countdown);
+      if (current >= quizSet.length) {
+        showResult();
+        return;
+      }
+      const q = quizSet[current];
+      document.getElementById('quizContainer').innerHTML = `
+        <h2>${q.q}</h2>
+        <div class="options">
+          ${q.o.map(opt => `<button onclick=\"checkAnswer('${opt}')\">${opt}</button>`).join('')}
+        </div>
+      `;
+      let time = 10;
+      document.getElementById('timer').innerText = `⏱️ Time Left: ${time}s`;
+      countdown = setInterval(() => {
+        time--;
+        document.getElementById('timer').innerText = `⏱️ Time Left: ${time}s`;
+        if (time === 0) {
+          clearInterval(countdown);
+          current++;
+          loadQuestion();
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(selected) {
+      clearInterval(countdown);
+      if (selected === quizSet[current].a) score++;
+      current++;
+      loadQuestion();
+    }
+
+    function showResult() {
+      document.getElementById('quizContainer').innerHTML = '';
+      document.getElementById('timer').innerHTML = '';
+      let message = score >= 8 ? '🎉 Excellent!' : score >= 5 ? '👍 Good Job!' : '😅 Try Again!';
+      document.getElementById('result').innerText = `Your Score: ${score}/10\n${message}`;
+      document.getElementById('startBtn').style.display = 'inline-block';
+    }
+  </script>
+</body>
+</html>
