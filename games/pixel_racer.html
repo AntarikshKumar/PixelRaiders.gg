@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Racer</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #game {
+      width: 400px;
+      height: 600px;
+      background: #222;
+      border: 3px solid #00ffd0;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .lane-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: repeating-linear-gradient(
+        to bottom,
+        white 0,
+        white 10px,
+        transparent 10px,
+        transparent 20px
+      );
+      opacity: 0.2;
+      z-index: 1;
+    }
+    .car {
+      width: 60px;
+      height: 100px;
+      position: absolute;
+      background: #555;
+      border-radius: 8px;
+      z-index: 3;
+    }
+    .car .roof {
+      width: 40px;
+      height: 30px;
+      background: #999;
+      border-radius: 4px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+    .car .window {
+      width: 10px;
+      height: 10px;
+      background: #ccc;
+      position: absolute;
+      top: 14px;
+    }
+    .car .window.left { left: 8px; }
+    .car .window.right { right: 8px; }
+    .car .wheel {
+      width: 12px;
+      height: 12px;
+      background: black;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .wheel.front.left { top: 2px; left: 4px; }
+    .wheel.front.right { top: 2px; right: 4px; }
+    .wheel.back.left { bottom: 2px; left: 4px; }
+    .wheel.back.right { bottom: 2px; right: 4px; }
+    #player {
+      background: linear-gradient(to bottom, #ff69b4, #c71585);
+      bottom: 10px;
+    }
+    .obstacle {
+      background: linear-gradient(to bottom, #ff4444, #990000);
+      top: -100px;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      z-index: 5;
+    }
+    .explosion {
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, orange, red, transparent);
+      border-radius: 50%;
+      position: absolute;
+      animation: explode 0.5s ease-out forwards;
+      z-index: 99;
+    }
+    @keyframes explode {
+      0% { transform: scale(0.3); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    #game-over {
+      color: #ff4444;
+      margin-top: 15px;
+      font-size: 20px;
+      display: none;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background: #00ffd0;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="lane-line" style="left: 80px;"></div>
+    <div class="lane-line" style="left: 160px;"></div>
+    <div class="lane-line" style="left: 240px;"></div>
+    <div class="lane-line" style="left: 320px;"></div>
+
+    <div id="player" class="car">
+      <div class="roof"></div>
+      <div class="window left"></div>
+      <div class="window right"></div>
+      <div class="wheel front left"></div>
+      <div class="wheel front right"></div>
+      <div class="wheel back left"></div>
+      <div class="wheel back right"></div>
+    </div>
+
+    <div id="score">Score: 0</div>
+  </div>
+  <div id="game-over">
+    💥 Game Over! <br><span id="final-score"></span><br>
+    <button id="retry">Retry</button>
+  </div>
+
+  <audio id="bgm" src="https://cdn.pixabay.com/audio/2022/11/24/audio_ba6dbf8986.mp3" autoplay loop></audio>
+  <audio id="crashSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8ce20b17f6.mp3"></audio>
+
+  <script>
+    let lanes = [20, 100, 180, 260, 340];
+    let player = document.getElementById("player");
+    let game = document.getElementById("game");
+    let scoreDisplay = document.getElementById("score");
+    let crashSound = document.getElementById("crashSound");
+    let retryButton = document.getElementById("retry");
+    let laneIndex = 2;
+    let speed = 5;
+    let score = 0;
+    let gameRunning = false;
+    let obstacles = [];
+    let animationId;
+
+    function enableControls() {
+      document.addEventListener("keydown", handleKeyPress);
+    }
+
+    function disableControls() {
+      document.removeEventListener("keydown", handleKeyPress);
+    }
+
+    function handleKeyPress(e) {
+      if (!gameRunning) return;
+      if (e.key === "ArrowLeft" && laneIndex > 0) laneIndex--;
+      else if (e.key === "ArrowRight" && laneIndex < 4) laneIndex++;
+      player.style.left = lanes[laneIndex] + "px";
+    }
+
+    function spawnObstacle() {
+      const lane = Math.floor(Math.random() * 5);
+      const obs = document.createElement("div");
+      obs.className = "car obstacle";
+      obs.innerHTML = `
+        <div class="roof"></div>
+        <div class="window left"></div>
+        <div class="window right"></div>
+        <div class="wheel front left"></div>
+        <div class="wheel front right"></div>
+        <div class="wheel back left"></div>
+        <div class="wheel back right"></div>`;
+      obs.style.left = lanes[lane] + "px";
+      obs.dataset.y = -100;
+      obs.style.top = "-100px";
+      game.appendChild(obs);
+      obstacles.push(obs);
+    }
+
+    function spawnLoop() {
+      if (!gameRunning) return;
+      spawnObstacle();
+      setTimeout(spawnLoop, Math.random() * 800 + 300);
+    }
+
+    function explode(x, y) {
+      const boom = document.createElement("div");
+      boom.className = "explosion";
+      boom.style.left = x + "px";
+      boom.style.top = y + "px";
+      game.appendChild(boom);
+      setTimeout(() => boom.remove(), 600);
+    }
+
+    function checkCollision(r1, r2) {
+      return !(
+        r2.top > r1.bottom ||
+        r2.bottom < r1.top ||
+        r2.left > r1.right ||
+        r2.right < r1.left
+      );
+    }
+
+    function loop() {
+      if (!gameRunning) return;
+
+      const playerRect = player.getBoundingClientRect();
+
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        let y = parseFloat(obs.dataset.y);
+        y += speed;
+        obs.dataset.y = y;
+        obs.style.top = y + "px";
+
+        const obsRect = obs.getBoundingClientRect();
+        if (checkCollision(playerRect, obsRect)) {
+          gameRunning = false;
+          disableControls();
+          cancelAnimationFrame(animationId);
+          crashSound.play();
+          explode(player.offsetLeft, player.offsetTop);
+          document.getElementById("game-over").style.display = "block";
+          document.getElementById("final-score").textContent = "Your Score: " + score;
+          return;
+        }
+
+        if (y > 600) {
+          obs.remove();
+          obstacles.splice(i, 1);
+          score++;
+          scoreDisplay.textContent = "Score: " + score;
+          speed += 0.05;
+        }
+      }
+
+      animationId = requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      laneIndex = 2;
+      player.style.left = lanes[laneIndex] + "px";
+      player.style.bottom = "10px";
+      speed = 5;
+      score = 0;
+      scoreDisplay.textContent = "Score: 0";
+      obstacles.forEach(obs => obs.remove());
+      obstacles = [];
+      document.getElementById("game-over").style.display = "none";
+      gameRunning = true;
+      enableControls();
+      spawnLoop();
+      loop();
+    }
+
+    window.onload = () => {
+      startGame();
+    };
+
+    retryButton.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
